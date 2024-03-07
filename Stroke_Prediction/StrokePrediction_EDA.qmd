@@ -1,0 +1,73 @@
+---
+title: "StrokePrediction_EDA"
+format: html
+editor: visual
+---
+
+# Stroke Prediction EDA
+
+## Loading in important libraries and the data
+
+```{r}
+library(tidyverse)
+library(stats)
+library(ggthemes)
+
+data <- read_csv('C:\\Users\\Tyron\\OneDrive\\Desktop\\Machine Learning Projects\\Machine-Learning-Projects\\Stroke_Prediction\\healthcare-dataset-stroke-data.csv')
+```
+
+## Exploring the Gender column
+
+```{r}
+ggplot(data=data, aes(x=gender, fill=gender)) + geom_bar() + labs(
+  title='Distribution of genders in the dataset',
+  x='Gender',
+  y='Count'
+)
+```
+
+Exploring a bit deeper into the gender column
+
+```{r}
+gender_group <- data %>% group_by(gender) %>% summarise(count=n())
+
+print(gender_group)
+```
+
+Looking deeper within each gender
+
+```{r}
+female_data <- data %>% filter(gender=='Female')
+female_strokes <- sum(female_data$stroke)
+female_stroke_portion <- female_strokes / length(female_data$stroke) * 100
+
+paste('Female Stroke Preportion : ', female_stroke_portion)
+```
+
+```{r}
+male_data <- data %>% filter(gender=='Male')
+male_strokes <- sum(male_data$stroke)
+male_stroke_portion <- male_strokes / length(male_data$stroke) * 100
+
+paste('Male Stroke Preportion : ', male_stroke_portion)
+```
+
+Conclusion: The female gender rains dominant in this data with 800+ more observations than its runner up the male gender with one instance of other present within the data which we can assume means that this gender was not disclosed. Around 4.71% of Females in the data have had strokes which is a little less than the 5.11% of Men that have had strokes. However one can't make an assumption that Men have had significant more strokes given how close the proportions are.
+
+## Exploring the Age column
+
+```{r}
+ggplot(data=data, aes(x=age)) + geom_histogram(fill='red') + labs(
+  title='Distribution of Ages',
+  x='Age',
+  y='Count'
+) + scale_x_continuous(breaks=seq(0, 85, 5)) + scale_y_continuous(breaks=seq(0, 190, 30)) + theme(axis.title =element_text(face='bold', color='darkred'), title=element_text(color='darkred'))
+```
+
+```{r}
+ggplot(data=data, aes(x=age)) + geom_density(fill='red', alpha=0.5) + labs(
+  title='Density Plot Of Age Variable',
+  x='Age',
+  y='Density'
+) + theme(axis.title =element_text(face='bold', color='darkred'), title=element_text(color='darkred'))
+```
