@@ -16,13 +16,20 @@ library(ggthemes)
 data <- read_csv('C:\\Users\\Tyron\\OneDrive\\Desktop\\Machine Learning Projects\\Machine-Learning-Projects\\Stroke_Prediction\\healthcare-dataset-stroke-data.csv')
 ```
 
+## General Overview of Dataset
+
+```{r}
+glimpse(data)
+```
+
 ## Exploring the Gender column
 
 ```{r}
 ggplot(data=data, aes(x=gender, fill=gender)) + geom_bar() + labs(
   title='Distribution of genders in the dataset',
   x='Gender',
-  y='Count'
+  y='Count',
+  fill='Gender'
 )
 ```
 
@@ -41,7 +48,7 @@ female_data <- data %>% filter(gender=='Female')
 female_strokes <- sum(female_data$stroke)
 female_stroke_portion <- female_strokes / length(female_data$stroke) * 100
 
-paste('Female Stroke Preportion : ', female_stroke_portion)
+paste('Female Stroke Proportion : ', round(female_stroke_portion, 2))
 ```
 
 ```{r}
@@ -49,7 +56,7 @@ male_data <- data %>% filter(gender=='Male')
 male_strokes <- sum(male_data$stroke)
 male_stroke_portion <- male_strokes / length(male_data$stroke) * 100
 
-paste('Male Stroke Preportion : ', male_stroke_portion)
+paste('Male Stroke Proportion : ', round(male_stroke_portion, 2))
 ```
 
 Conclusion: The female gender rains dominant in this data with 800+ more observations than its runner up the male gender with one instance of other present within the data which we can assume means that this gender was not disclosed. Around 4.71% of Females in the data have had strokes which is a little less than the 5.11% of Men that have had strokes. However one can't make an assumption that Men have had significant more strokes given how close the proportions are.
@@ -70,4 +77,254 @@ ggplot(data=data, aes(x=age)) + geom_density(fill='red', alpha=0.5) + labs(
   x='Age',
   y='Density'
 ) + theme(axis.title =element_text(face='bold', color='darkred'), title=element_text(color='darkred'))
+```
+
+```{r}
+summary(data$age)
+```
+
+Conclusion : The age column seems to have a lot of variation ranging from ages of 0 to 85 with the peak of the distribution of ages falling between the range of 40 and 60 with the max age being 82 and the minimum age being 0.08 and the mean observed age being 43.23.
+
+## Exploring the Hypertension column
+
+```{r}
+data$hypertension[data$hypertension == 1] <- 'Yes'
+data$hypertension[data$hypertension == 0] <- 'No'
+```
+
+```{r}
+ggplot(data=data, aes(x=hypertension, fill=hypertension)) + geom_bar() + labs(
+  title='Distribution of Hypertension',
+  x='Hypertension Present',
+  y='Count',
+  fill='Hypertension'
+)
+```
+
+```{r}
+hypertension_data <- data %>% group_by(hypertension) %>% summarize(count=n())
+
+print(hypertension_data)
+```
+
+```{r}
+hypertension_preportion <- hypertension_data$count[2] / length(data$hypertension) * 100
+
+paste('Proportion of Hypertebnsion : ', round(hypertension_preportion, 2))
+```
+
+Is the proportion of strokes higher in people with hypertension ?
+
+```{r}
+hyper_y <- data %>% filter(hypertension == 'Yes')
+hyper_n <- data %>% filter(hypertension == 'No')
+
+hyper_y_stroke_p <- sum(hyper_y$stroke) / length(hyper_y$stroke) * 100
+
+hyper_n_stroke_p <- sum(hyper_n$stroke) / length(hyper_n$stroke) * 100
+
+paste('Hypertension Present (Stroke) : ', round(hyper_y_stroke_p, 2))
+paste('Hypertension Not Present (Stroke) : ', round(hyper_n_stroke_p, 2))
+```
+
+People that have hypertension seem to have a higher probability to get strokes however this is just an assumption as the sample sizes differ a lot therefore further testing would be required to fully say that hypertension leads to more strokes.
+
+## Exploring the Heart Disease Column
+
+```{r}
+data$heart_disease[data$heart_disease==1] <- 'Yes'
+data$heart_disease[data$heart_disease==0] <- 'No'
+```
+
+```{r}
+ggplot(data=data, aes(x=heart_disease, fill=heart_disease)) + geom_bar() + labs(
+  title='Distribution of Heart Disease',
+  x='Heart Disease Present',
+  y='Count',
+  fill='Heart Disease'
+)
+```
+
+Do people with Heart Disease have a higher probability of getting a stroke?
+
+```{r}
+heart_d_y <- data %>% filter(heart_disease=='Yes')
+heart_d_n <- data %>% filter(heart_disease=='No') 
+
+stroke_p_heart_y <- sum(heart_d_y$stroke) / length(heart_d_y$stroke) * 100
+
+stroke_p_heart_n <- sum(heart_d_n$stroke) / length(heart_d_n$stroke) * 100
+
+paste('Heart Disease Present (Stroke) : ', round(stroke_p_heart_y, 2),'%')
+paste('Heart Disease Not Present (Stroke) : ', round(stroke_p_heart_n, 2),'%')
+```
+
+There seems to be a higher probability of getting a stroke when heart disease is present however further statistical test will be need to be done to validate this assumption.
+
+## Exploring the ever_married column
+
+```{r}
+ggplot(data=data, aes(x=ever_married, fill=ever_married)) + geom_bar() + labs(
+  title='Distribution of ever_married feature',
+  x='Ever Married (Yes or No)',
+  y='Count',
+  fill='Ever Married'
+)
+```
+
+Majority people in this dataset have been married before or is still married does being married or have been married, have a higher proportion of people having strokes ?
+
+```{r}
+married_y_stroke <- data %>% filter(ever_married=='Yes')
+married_n_stroke <- data %>% filter(ever_married=='No')
+
+married_y_p <- sum(married_y_stroke$stroke) / length(married_y_stroke$stroke) * 100
+
+married_n_p <- sum(married_n_stroke$stroke) / length(married_n_stroke$stroke) * 100
+
+
+paste('Ever Married(Yes) Stroke Proportion :', round(married_y_p, 2), '%')
+
+paste('Ever Married(No) Stroke Proportion :', round(married_n_p, 2), '%')
+```
+
+People who are married or have been married have a higher proportion of people who have suffered strokes compared to people who are not married however further statistical analysis is required to determine whether this is significant.
+
+## Exploring work_type feature
+
+```{r}
+work_type <- data %>% mutate(work_type=work_type%>%
+                               fct_infreq())
+
+ggplot(data=work_type, aes(x=work_type, fill=work_type)) + geom_bar() + labs(
+  title='Distribution of Work Types',
+  x='Work Type',
+  y='Count',
+  fill='Work Type'
+) + scale_fill_brewer(palette='Set2')
+```
+
+## Exploring residence_type
+
+```{r}
+res_type <- data %>% mutate(Residence_type=fct_infreq(Residence_type)) 
+
+ggplot(data=res_type, aes(x=Residence_type, fill=Residence_type)) + geom_bar() + labs(
+  title='Distribution of Residence Types',
+  x='Residence Type',
+  y='Count',
+  fill='Residence Type'
+)
+```
+
+The distribution of residence types seem to be fairly distributed between Urban residence and Rural residence
+
+Do the two residence types have different stroke proportions than each other?
+
+```{r}
+res_urb <- data %>% filter(Residence_type=='Urban')
+res_rur <- data %>% filter(Residence_type=='Rural')
+
+res_urb_stroke_p <- sum(res_urb$stroke) / length(res_urb$stroke) * 100
+
+res_rur_stroke_p <- sum(res_rur$stroke) / length(res_rur$stroke) * 100
+
+paste('Urban Residence Stroke Proportion :', round(res_urb_stroke_p,2),'%')
+
+paste('Rural Residence Stroke Proportion :', round(res_rur_stroke_p, 2),'%')
+```
+
+The proportions are very similar urban residence type does not seem to hold a big difference in stroke victims.
+
+## Exploring average_glucose_level Column
+
+```{r}
+ggplot(data=data, aes(x=avg_glucose_level)) + geom_histogram(fill='blue') + labs(
+  title='Distribution of Average Glucose Levels',
+  x='Average Glucose Level',
+  y='Count'
+) + scale_x_continuous(breaks=seq(0, 300, 20)) + scale_y_continuous(breaks=seq(0, 700, 100))
+```
+
+Taking a closer look at the average glucose levels
+
+```{r}
+ggplot(data=data, aes(x=avg_glucose_level)) + geom_histogram(fill='blue') + coord_cartesian(ylim=c(0, 50)) + labs(
+  title='Distribution of Average Glucose Levels',
+  x='Average Glucose Level',
+  y='Count'
+) + scale_x_continuous(breaks=seq(0, 300, 20)) + scale_y_continuous(breaks=seq(0, 50, 10))
+```
+
+The unusual glucose levels are from the ranges of 40 till 60 and ranges between 140 till 200 and then from 230 till 280 these glucose level ranges have counts of less than 50 which makes them quite rare and unusual within this dataset.
+
+```{r}
+ggplot(data=data, aes(x=avg_glucose_level)) + geom_density(fill='blue') + labs(
+  title='Distribution of Average Glucose Levels',
+  x='Average Glucose Level',
+  y='Density'
+) + scale_x_continuous(breaks=seq(0, 280, 20))
+```
+
+The average glucose levels seem to be centered around 60 and 100 and it is heavily skewed to the right.
+
+## Exploring the BMI feature
+
+since BMI is a character variable which is incorrect we need to parse it into a double variable using parse_double
+
+```{r}
+data$bmi <- parse_double(data$bmi)
+```
+
+```{r}
+ggplot(data=data, aes(x=bmi)) + geom_histogram(fill='purple') + scale_x_continuous(breaks=seq(0, 100, 10)) + scale_y_continuous(breaks=seq(0, 800, 100)) + labs(
+  title='Distribution of BMI',
+  x='BMI',
+  y='Count'
+)
+```
+
+Taking a deeper look into BMI
+
+```{r}
+ggplot(data=data, aes(x=bmi)) + geom_histogram(fill='purple') + coord_cartesian(ylim=c(0, 20)) + scale_y_continuous(breaks=seq(0, 20, 2)) + scale_x_continuous(breaks=seq(0, 100, 10)) + labs(
+  title='Distribution of BMI',
+  x='BMI',
+  y='Count'
+)
+```
+
+```{r}
+
+ggplot(data=data, aes(x=bmi)) + geom_density(fill='purple') + labs(
+  title='Density of BMI',
+  x='BMI',
+  y='Density'
+) + scale_x_continuous(breaks=seq(0, 100, 10))
+```
+
+The BMI variable seems to be normally distributed skewed heavily to the right however these values could be outliers
+
+```{r}
+ggplot(data=data, aes(y=bmi)) + geom_boxplot(fill='purple') + labs(
+  title='Boxplot of BMI',
+  y='BMI'
+) + scale_y_continuous(breaks=seq(0, 100, 10))
+```
+
+There seems to be a lot of outliers just before 50 and past it
+
+## Exploring the smoking_status variable
+
+```{r}
+data <- data %>% mutate(smoking_status=fct_infreq(fct_recode(smoking_status,
+  'Smokes' = 'smokes',
+  'Formerly Smoked' = 'formerly smoked'
+)))
+
+ggplot(data=data, aes(x=smoking_status, fill=smoking_status)) + geom_bar() + scale_fill_brewer(palette='Set2') + labs(
+  title="Distribution of Smoking Status",
+  x='Smoking Status',
+  y='Count'
+)
 ```
