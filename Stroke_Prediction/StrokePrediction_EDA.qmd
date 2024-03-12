@@ -328,3 +328,55 @@ ggplot(data=data, aes(x=smoking_status, fill=smoking_status)) + geom_bar() + sca
   y='Count'
 )
 ```
+
+## Finding Features that might counter imbalances in dataset
+
+```{r}
+stroke_y <- data %>% filter(stroke==1)
+stroke_n <- data %>% filter(stroke==0)
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=age)) + geom_density(fill='red', alpha=0.5) + geom_density(data=stroke_n, aes(x=age), fill='blue', alpha=0.5) + labs(
+  title="Age Density of Two Classes",
+  subtitle='Stroke vs No Stroke',
+  x="Age",
+  y='Density'
+)
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=bmi)) + geom_density(fill='red', alpha=0.5) + geom_density(data=stroke_n, aes(x=bmi), fill='blue', alpha=0.5) + labs(
+  title='BMI Density of Two Classes',
+  x='BMI',
+  y='Density'
+)
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=avg_glucose_level)) + geom_density(fill='red', alpha=0.5) + geom_density(data=stroke_n, aes(x=avg_glucose_level), fill='blue', alpha=0.5)
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=hypertension)) + geom_bar(fill='red') + coord_polar()
+```
+
+```{r}
+ggplot(data=stroke_n, aes(x=hypertension)) + geom_bar(fill='blue') + coord_polar()
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=heart_disease)) + geom_bar(fill='red') + coord_polar()
+```
+
+```{r}
+ggplot(data=stroke_n, aes(x=heart_disease)) + geom_bar(fill='blue') + coord_polar()
+```
+
+```{r}
+ggplot(data=stroke_y, aes(x=ever_married)) + geom_bar(fill='red') + coord_polar()
+```
+
+```{r}
+ggplot(data=stroke_n, aes(x=ever_married)) + geom_bar(fill='blue') + coord_polar()
+```
